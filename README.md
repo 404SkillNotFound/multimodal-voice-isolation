@@ -1,4 +1,4 @@
-# 🎙️ Multimodal Voice Isolation (The Cocktail Party Problem)
+# Multimodal Voice Isolation (The Cocktail Party Problem)
 
 
 This project implements a **Multimodal Late Fusion Pipeline** to isolate a target speaker's voice from a noisy, overlapping audio environment. 
