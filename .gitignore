@@ -1,0 +1,9 @@
+@'
+__pycache__/
+*.py[cod]
+cocktail_env/
+venv/
+raw_videos/
+outputs/*.wav
+temp_*.wav
+'@ | Out-File -FilePath .gitignore -Encoding utf8
