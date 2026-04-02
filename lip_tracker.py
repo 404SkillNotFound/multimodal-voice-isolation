@@ -57,7 +57,7 @@ def _build_detector():
 
 def get_lip_movement(video_path, max_seconds=None):
     if max_seconds is None:
-        max_seconds = int(os.getenv("LIP_MAX_SECONDS", "5"))
+        max_seconds = int(os.getenv("MAX_CLIP_SECONDS", "10"))
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():

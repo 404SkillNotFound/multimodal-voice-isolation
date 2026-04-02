@@ -8,10 +8,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <div class="page">
+
+  <div id="backendBanner" class="alert warn hidden">
+    <div class="alert-icon">⚠</div>
+    <div id="backendBannerMsg">Backend not running. Start the server with <code>python app.py</code> before uploading.</div>
+  </div>
 
   <header>
     <div class="hdr-left">
@@ -93,12 +98,22 @@
       </div>
     </div>
 
-    <div class="lip-section hidden" id="lipSection">
-      <div class="lip-label">Lip Movement Analysis</div>
-      <div class="lip-img-wrap">
-        <img id="lipImg" src="" alt="Lip Movement Graph">
+      <div id="lipSection" class="hidden">
+        <div class="lip-label">LIP MOVEMENT vs ENERGY ANALYSIS</div>
+        <div class="lip-img-wrap">
+          <img id="lipImg" src="" alt="Lip graph">
+        </div>
+        <div class="energy-panel-grid">
+          <div class="energy-panel" id="e1Panel">
+            <div class="energy-label">TRACK 1</div>
+            <img id="e1Img" src="" alt="Track 1 Energy">
+          </div>
+          <div class="energy-panel" id="e2Panel">
+            <div class="energy-label">TRACK 2</div>
+            <img id="e2Img" src="" alt="Track 2 Energy">
+          </div>
+        </div>
       </div>
-    </div>
 
     <div class="audio-grid" id="audioGrid"></div>
 
@@ -117,6 +132,6 @@
   </div>
 
 </div>
-<script src="app.js"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

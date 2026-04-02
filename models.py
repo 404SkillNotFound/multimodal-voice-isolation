@@ -69,6 +69,8 @@ def load_separator():
     for repo, sr in candidates:
         try:
             print(f"loading {repo}...")
+            if not os.path.isdir(os.path.join("pretrained_models", repo.split("/")[-1])):
+                print("downloading conv-tasnet (~45MB, first run only)...")
             model = ConvTasNet.from_pretrained(repo)
             model.eval()
             if torch.cuda.is_available():

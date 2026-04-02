@@ -310,6 +310,44 @@ h1 em { color: var(--acc); font-style: normal; }
   filter: saturate(1.4) brightness(.9);
 }
 
+.energy-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .energy-panel-grid { grid-template-columns: 1fr; }
+}
+
+.energy-panel {
+  background: var(--s1); 
+  border: 1px solid var(--b1);
+  padding: 8px; text-align: center;
+}
+
+.energy-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 8px;
+  text-align: left;
+}
+
+.energy-panel.winner-panel {
+  border-color: var(--acc);
+}
+
+.energy-panel.loser-panel {
+  border-color: var(--b2);
+}
+
+.energy-panel img {
+  max-width: 100%; height: auto; display: block;
+  filter: saturate(1.4) brightness(.9);
+}
+
 .audio-grid { display: grid; gap: 16px; }
 
 .acard {

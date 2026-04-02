@@ -8,6 +8,9 @@ import numpy as np
 import librosa
 import soundfile as sf
 import torch
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 
 import models
@@ -96,6 +99,26 @@ def zscore(x):
     return (x - np.mean(x)) / s
 
 
+def plot_energy(envelope, fps, label, out_path, is_winner):
+    times = np.arange(len(envelope)) / fps
+    color = "mediumseagreen" if is_winner else "lightsteelblue"
+    
+    fig, ax = plt.subplots(figsize=(13, 3))
+    ax.plot(times, envelope, color=color, linewidth=1.5, label=label)
+    ax.axhline(np.mean(envelope), color="crimson", linestyle="--", linewidth=1,
+               label=f"Mean ({np.mean(envelope):.3f})")
+    ax.fill_between(times, envelope, alpha=0.15, color=color)
+    ax.set_title(f"{label} RMS Energy", fontsize=11)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Amplitude")
+    ax.legend(loc="upper right", fontsize=8)
+    if len(times) > 0:
+        ax.set_xlim(times[0], times[-1])
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
 def match_speaker(lips, detection_rate, e1, e2, fps):
     n = min(len(lips), len(e1), len(e2))
     e1, e2 = e1[:n], e2[:n]
@@ -136,6 +159,8 @@ def run_pipeline(job_id, v1_path, v2_path):
         job.update(step="separating", progress=22)
         label = "Conv-TasNet" if models.SEP_BACKEND == "convtasnet" else "Spectral"
         log(job, f"source separation ({label})...")
+        if models.SEP_BACKEND == "convtasnet" and models.SEP_MODEL is None:
+            log(job, "downloading conv-tasnet (~45MB, first run only)...")
         separate(f"{prefix}_mixed.wav", f"{prefix}_v1.wav", f"{prefix}_v2.wav")
         log(job, "separation done")
         job.update(progress=68)
@@ -143,7 +168,7 @@ def run_pipeline(job_id, v1_path, v2_path):
         job.update(step="lip_tracking", progress=70)
         log(job, "tracking lips...")
         from lip_tracker import get_lip_movement, plot_lip_movement
-        lip_data = get_lip_movement(v1_path, max_seconds=int(os.getenv("LIP_MAX_SECONDS", "5")))
+        lip_data = get_lip_movement(v1_path)
 
         face_ok = lip_data["detection_rate"] >= 0.05
         if face_ok:
@@ -171,6 +196,9 @@ def run_pipeline(job_id, v1_path, v2_path):
         log(job, f"track 1: {c1:.3f}  track 2: {c2:.3f} ({method})")
         log(job, f"target: {matched}")
 
+        plot_energy(e1, fps, "Voice 1", f"{prefix}_e1.png", is_winner=(matched == "voice1"))
+        plot_energy(e2, fps, "Voice 2", f"{prefix}_e2.png", is_winner=(matched == "voice2"))
+
         job.update(
             step="done", progress=100, status="complete",
             corr1=c1, corr2=c2,
@@ -181,6 +209,8 @@ def run_pipeline(job_id, v1_path, v2_path):
             voice2=f"{job_id}_v2.wav",
             mixed=f"{job_id}_mixed.wav",
             graph_url=f"/api/image/{job_id}_lips.png" if face_ok else None,
+            graph_e1=f"/api/image/{job_id}_e1.png",
+            graph_e2=f"/api/image/{job_id}_e2.png",
         )
 
     except Exception as e:

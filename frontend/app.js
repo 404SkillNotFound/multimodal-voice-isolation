@@ -7,6 +7,24 @@ const wavesurfers = {};
 
 const $ = id => document.getElementById(id);
 
+async function checkBackend() {
+  const banner = document.getElementById('backendBanner');
+  const msg    = document.getElementById('backendBannerMsg');
+  try {
+    const res = await fetch(API + '/api/health');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.backend === 'spectral') {
+      msg.textContent = 'Conv-TasNet failed to load. Running on spectral fallback — separation quality will be poor.';
+      banner.classList.remove('hidden');
+    }
+  } catch {
+    banner.classList.remove('hidden');
+  }
+}
+
+checkBackend();
+
 const runBtn    = $('runBtn');
 const termBody  = $('termBody');
 const termWrap  = $('termWrap');
@@ -203,9 +221,35 @@ function renderResults(job) {
   renderMethodNote(job.method);
   renderCorrBars(job.corr1, job.corr2, job.matched);
 
-  if (job.graph_url) {
+  if (job.graph_url || (job.graph_e1 && job.graph_e2)) {
     lipSect.classList.remove('hidden');
-    lipImg.src = API + job.graph_url + '?t=' + Date.now();
+    
+    if (job.graph_url) {
+      lipImg.src = API + job.graph_url + '?t=' + Date.now();
+      lipImg.style.display = 'block';
+    } else {
+      lipImg.style.display = 'none';
+    }
+
+    const t = Date.now();
+    const e1Panel = document.getElementById('e1Panel');
+    const e2Panel = document.getElementById('e2Panel');
+    const e1Img = document.getElementById('e1Img');
+    const e2Img = document.getElementById('e2Img');
+
+    if (job.graph_e1 && job.graph_e2) {
+      e1Panel.style.display = 'block';
+      e2Panel.style.display = 'block';
+      e1Img.src = API + job.graph_e1 + '?t=' + t;
+      e2Img.src = API + job.graph_e2 + '?t=' + t;
+      
+      e1Panel.className = 'energy-panel ' + (job.matched === 'voice1' ? 'winner-panel' : 'loser-panel');
+      e2Panel.className = 'energy-panel ' + (job.matched === 'voice2' ? 'winner-panel' : 'loser-panel');
+    } else {
+      e1Panel.style.display = 'none';
+      e2Panel.style.display = 'none';
+    }
+
   } else {
     lipSect.classList.add('hidden');
   }

@@ -7,6 +7,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 
 from models import load_separator
+import models
 from pipeline import JOBS, UPLOAD_DIR, OUTPUT_DIR, run_pipeline, start_cleanup_thread
 
 load_dotenv()
@@ -68,6 +69,11 @@ def serve_audio(filename):
 @app.route("/api/image/<filename>")
 def serve_image(filename):
     return send_from_directory(OUTPUT_DIR, os.path.basename(filename))
+
+
+@app.route("/api/health")
+def health():
+    return jsonify(status="ok", backend=models.SEP_BACKEND), 200
 
 
 @app.route("/")
