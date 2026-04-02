@@ -156,9 +156,9 @@ function initWaveSurfer(id, src, type) {
   if (!container) return;
 
   const palette = {
-    winner:  { wave: '#00e5a0', progress: '#00ffb5' },
-    loser:   { wave: '#1e3554', progress: '#2e4a6a' },
-    neutral: { wave: '#38b6ff', progress: '#60caff' },
+    winner:  { wave: '#282826', progress: '#6dba8a' },
+    loser:   { wave: '#282826', progress: '#343430' },
+    neutral: { wave: '#282826', progress: '#c9b87a' },
   };
   const c = palette[type] || palette.neutral;
 

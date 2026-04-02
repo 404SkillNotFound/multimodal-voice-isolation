@@ -37,12 +37,17 @@ def normalize(audio, headroom_db=-1.0):
 def extract_audio(src, dst, duration=None):
     if duration is None:
         duration = MAX_CLIP_SECONDS
-    subprocess.run(
-        [models.FFMPEG, "-y", "-i", src,
-         "-ar", str(models.TARGET_SR), "-ac", "1",
-         "-t", str(duration), dst],
-        capture_output=True, check=True,
-    )
+    try:
+        subprocess.run(
+            [models.FFMPEG, "-y", "-i", src,
+             "-ar", str(models.TARGET_SR), "-ac", "1",
+             "-vn", # Exclude video just in case
+             "-t", str(duration), dst],
+            capture_output=True, check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        err_msg = e.stderr.decode('utf-8', errors='ignore') if e.stderr else str(e)
+        raise RuntimeError(f"FFmpeg audio extraction failed. Does this video have an audio track? Details: {err_msg}")
 
 
 def mix_tracks(path_a, path_b, out_path):
